@@ -11,11 +11,15 @@ var tools = {
 
 var statLib = {
   min: function (values) {
-    return Math.min.apply(null, values);
+    return values.reduce(function (prev, curr) {
+      return (prev < curr ? prev : curr);
+    });
   },
   
   max: function (values) {
-    return Math.max.apply(null, values);
+    return values.reduce(function (prev, curr) {
+      return (prev > curr ? prev : curr);
+    });
   },
   
   sum: function (values) {
@@ -25,6 +29,8 @@ var statLib = {
   },
   
   mean: function (values, sum) {
+    var self = this;
+    
     var n = values.length;
     sum = (sum === void(0)) ? self.sum(values) : sum;
 
