@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Uncertainty calculator with speech recogniction input</title>
+    <link rel="stylesheet" href="app.css">
+  </head>
+  <body>
+    <div class="rssc-wrapper">
+      
+      <label>Values, separated by spaces or new lines</label>
+      <textarea id="inpuData" rows="10" cols="50"></textarea>
+      <label><input id="dictateToggler" type="checkbox"> Dictate</label>
+
+      <div class="results-wrapper">
+        <div class="results-item">
+          <label>Minimum</label>
+          <input id="minValue" type="text" readonly="readonly">
+        </div>
+
+        <div class="results-item">
+          <label>Maximum</label>
+          <input id="maxValue" type="text" readonly="readonly">
+        </div>
+
+        <div class="results-item">
+          <label>Sum</label>
+          <input id="sumValue" type="text" readonly="readonly">
+        </div>
+
+        <div class="results-item">
+          <label>Average</label>
+          <input id="meanValue" type="text" readonly="readonly">
+        </div>
+
+        <div class="results-item">
+          <label>Median</label>
+          <input id="medianValue" type="text" readonly="readonly">
+        </div>
+
+        <div class="results-item">
+          <label>Variance</label>
+          <input id="varianceValue" type="text" readonly="readonly">
+        </div>
+
+        <div class="results-item">
+          <label>Standard deviation</label>
+          <input id="stdDeviationValue" type="text" readonly="readonly">
+        </div>
+
+        <div class="results-item">
+          <label>Uncertainty type A</label>
+          <input id="uncertaintyValue" type="text" readonly="readonly">
+        </div>
+      </div>
+      
+    </div>
+    
+    <script src="app.js"></script>
+  </body>
+</html> 

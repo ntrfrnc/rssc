@@ -1,0 +1,39 @@
+.rssc-wrapper {
+  max-width: 736px;
+  margin:auto;
+}
+.rssc-wrapper *{
+  box-sizing: border-box;
+  font-family: Arial, sans-serif
+}
+.rssc-wrapper label{
+  font-weight: 700;
+  display: block;
+  margin-top: 1em;
+}
+.rssc-wrapper textarea{
+  width: 100%;
+  display: block;
+  padding: 10px;
+  resize: vertical;
+  border: 4px solid #000;
+}
+.rssc-wrapper input[readonly]{
+  border: none;
+  border-bottom: 4px solid #000;
+  padding: 10px
+}
+.rssc-wrapper .results-wrapper{
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: space-between;
+}
+.rssc-wrapper .results-wrapper::after{
+  content: '';
+  flex: auto;
+  min-width: 180px;
+  max-width: 180px;
+}
+.rssc-wrapper .results-item{
+  padding: 5px;
+}
