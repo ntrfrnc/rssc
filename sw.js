@@ -1,5 +1,5 @@
 self.addEventListener('install', function (e) {
-  e.waitUntil(caches.open('airhorner').then(function (cache) {
+  e.waitUntil(caches.open('rssc').then(function (cache) {
     return cache.addAll([
       '',
       'index.html',
