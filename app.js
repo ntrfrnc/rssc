@@ -1,3 +1,8 @@
+// Register service worker
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js');
+}
+
 var tools = {
   extend: function (targetObj, sourceObj) {
     for (var key in sourceObj) {
