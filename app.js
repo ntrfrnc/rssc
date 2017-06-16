@@ -224,6 +224,76 @@ var dictate = {
   }
 };
 
+var fileChooser = {
+  init: function (opts) {
+    var self = this;
+    /*
+     * opts = {
+     *   fileInput: (DOM object)
+     *   dropBox: (DOM object)
+     *   allowedFileMIMEsPattern: (RegExp) e.g. /text\/*/
+    /*   onChoose: function (files) {}
+     *   onError: function (errorMsg) {}
+     * }
+     */
+    self.opts = opts;
+
+    self.addEventListeners(self.opts.dropBox, 'drag dragstart dragend dragover dragenter dragleave drop', function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    });
+    self.addEventListeners(self.opts.dropBox, 'dragover dragenter', function (e) {
+      self.opts.dropBox.classList.add('is-dragover');
+    });
+    self.addEventListeners(self.opts.dropBox, 'dragleave dragend drop', function (e) {
+      self.opts.dropBox.classList.remove('is-dragover');
+    });
+    self.addEventListeners(self.opts.dropBox, 'drop', self.onDrop);
+    self.addEventListeners(self.opts.fileInput, 'change', self.onInput);
+
+    return self;
+  },
+
+  onDrop: function (e) {
+    var self = this;
+    var item = e.dataTransfer.items[0];
+
+    if (item.kind === 'file' && self.opts.allowedFileMIMEsPattern.test(item.type)) {
+      self.opts.onChoose(e.dataTransfer.files[0]);
+    } else {
+      if (typeof self.opts.onError === 'function') {
+        self.opts.onError('Chosen file has unsupported format.');
+      }
+    }
+  },
+
+  onInput: function (e) {
+    var self = this;
+
+    if (e.target.files.length < 1) {
+      return;
+    }
+
+    var file = e.target.files[0];
+
+    if (self.opts.allowedFileMIMEsPattern.test(file.type)) {
+      self.opts.onChoose(file);
+    } else {
+      if (typeof self.opts.onError === 'function') {
+        self.opts.onError('Chosen file has unsupported format.');
+      }
+    }
+  },
+
+  addEventListeners: function (element, events, fn) {
+    var self = this;
+
+    events.split(' ').forEach(function (event) {
+      element.addEventListener(event, fn.bind(self), false);
+    });
+  }
+};
+
 statCalc.init({
   input: document.getElementById('inpuData'),
   out: {
@@ -241,4 +311,27 @@ statCalc.init({
 dictate.init({
   toggler: document.getElementById('dictateToggler'),
   input: statCalc.opts.input
+});
+
+fileChooser.init({
+  fileInput: document.getElementById('fileInput'),
+  dropBox: document.body,
+  allowedFileMIMEsPattern: /text\/*|^$/,
+  onChoose: function (file) {
+    var reader = new FileReader();
+
+    reader.onload = function (e) {
+      statCalc.opts.input.value = e.target.result;
+      event = new Event('input');
+      statCalc.opts.input.dispatchEvent(event);
+    };
+    reader.onerror = function (e) {
+      console.error(e);
+    };
+
+    reader.readAsText(file);
+  },
+  onError: function (errorMsg) {
+    alert(errorMsg);
+  }
 });
