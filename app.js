@@ -90,16 +90,16 @@ var statCalc = {
     var self = this;
     /*
      * opts = {
-     *   input: (DOM object)
+     *   input: (DOM object - text input or textarea)
      *   out:{
-     *     min: (DOM object)
-     *     max: (DOM object)
-     *     sum: (DOM object)
-     *     mean: (DOM object)
-     *     median: (DOM object)
-     *     variance: (DOM object)
-     *     stdDeviation: (DOM object)
-     *     uncertainty: (DOM object)
+     *     min: (DOM object - text input)
+     *     max: (DOM object - text input)
+     *     sum: (DOM object - text input)
+     *     mean: (DOM object - text input)
+     *     median: (DOM object - text input)
+     *     variance: (DOM object - text input)
+     *     stdDeviation: (DOM object - text input)
+     *     uncertainty: (DOM object - text input)
      *   }
      * }
      */
@@ -157,8 +157,8 @@ var dictate = {
     var self = this;
 
     self.opts = {
-      // toggler: (DOM object),
-      // input: (DOM object),
+      // toggler: (DOM object - checkbox),
+      // input: (DOM object - text input or textarea),
       continous: true,
       lang: 'pl-PL'
     };
@@ -229,7 +229,7 @@ var fileChooser = {
     var self = this;
     /*
      * opts = {
-     *   fileInput: (DOM object)
+     *   fileInput: (DOM object - file input)
      *   dropBox: (DOM object)
      *   allowedFileMIMEsPattern: (RegExp) e.g. /text\/*/
     /*   onChoose: function (files) {}
