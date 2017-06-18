@@ -9,6 +9,7 @@
     <title>Realtime simple statistics calculator</title>
     <link rel='shortcut icon' type='image/png' href='images/icon-16.png'>
     <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/dygraph/2.0.0/dygraph.min.css" />
     <link rel="stylesheet" href="app.css">
   </head>
   <body>
@@ -31,7 +32,7 @@
         </div> 
         
         <div class="column-selector-item">
-          <label>Choose column</label>
+          <label>Choose a column</label>
           <select class="column-selector" id="calcColumnSelector"></select> 
         </div>
       </div>
@@ -77,9 +78,14 @@
           <input id="uncertaintyValue" type="text" readonly="readonly">
         </div>
       </div>
-
+      
+      <div class="plot-section">
+        <div class="plot-wrapper" style="width:95%; height:350px;" id="plotWrapper"></div>
+      </div>
+      
     </div>
-
+    
+    <script src="//cdnjs.cloudflare.com/ajax/libs/dygraph/2.0.0/dygraph.min.js"></script>
     <script src="app.js"></script>
   </body>
 </html> 

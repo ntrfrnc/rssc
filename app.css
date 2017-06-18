@@ -141,3 +141,29 @@ body{
 .rssc-wrapper .results-item{
   padding: 5px;
 }
+
+/* Plot */
+.plot-section{
+  margin: 3em auto;
+  padding: 15px;
+  padding-top:30px;
+  background-color:#101015;
+  border-radius: 4px;
+}
+.plot-wrapper{
+  position:relative;
+  color: #fff;
+}
+.plot-wrapper * {
+  color: #fff;
+}
+.dygraph-legend {
+  width:100%;
+  text-align: right;
+  background:#101015;
+  /*top:10px !important;*/
+  top: -18px !important;
+}
+/*.plot-wrapper > div:first-child > div:nth-child(7){
+  top:-18px !important;
+}*/

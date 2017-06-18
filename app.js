@@ -43,6 +43,7 @@ var statLib = {
   },
 
   median: function (values) {
+    values = [].concat(values);
     values.sort(function (a, b) {
       return a - b;
     });
@@ -105,8 +106,8 @@ var dataHandler = {
 
   processData: function (data) {
     var self = this;
-    
-    if(data.length < 1) {
+
+    if (data.length < 1) {
       self.opts.onChange(null, 0);
       return;
     }
@@ -116,7 +117,7 @@ var dataHandler = {
       console.error('Unsupported data detected');
       return;
     }
-    
+
     var values = self.extractNumbers(data);
 
     if (columns > 1) {
@@ -180,12 +181,12 @@ var statCalc = {
      * }
      */
     self.opts = opts;
-    
+
     self.columnSelector = null;
     self.selectedColumn = 0;
     self.lastColumnsNumber = 0;
     self.lastData = null;
-    
+
     self.rebuildColumnSelector(0);
     self.opts.columnSelector.addEventListener('change', self.onColumnChange.bind(self));
 
@@ -194,9 +195,9 @@ var statCalc = {
 
   calculate: function (data, columns) {
     var self = this;
-    
+
     self.lastData = data;
-    
+
     if (!data) {
       self.clear();
       return;
@@ -206,7 +207,7 @@ var statCalc = {
       self.lastColumnsNumber = columns;
       self.rebuildColumnSelector(columns);
     }
-    
+
     var values = (columns > 1) ? data[self.selectedColumn] : data;
 
     // Calculate stats
@@ -219,40 +220,40 @@ var statCalc = {
     self.opts.out.stdDeviation.value = statLib.stdDeviation(values, self.opts.out.variance.value);
     self.opts.out.uncertainty.value = statLib.uncertainty(values, self.opts.out.variance.value);
   },
-  
+
   onColumnChange: function (e) {
     var self = this;
-    
+
     var select = e.target;
     self.selectedColumn = select.options[select.selectedIndex].value;
-    
+
     self.calculate(self.lastData, self.lastColumnsNumber);
   },
 
   rebuildColumnSelector: function (columns) {
     var self = this;
-    
+
     if (columns === 0) {
       self.opts.columnSelector.innerHTML = '<option>No columns detected</option>';
       return;
     }
-    
+
     self.opts.columnSelector.innerHTML = '';
     var frag = document.createDocumentFragment();
-    
+
     for (var i = 0; i < columns; i++) {
       var opt = document.createElement('option');
       opt.innerHTML = 'Column ' + i;
       opt.value = i;
       frag.appendChild(opt);
     }
-    
+
     self.opts.columnSelector.appendChild(frag);
-    
+
     if (self.selectedColumn + 1 > self.lastColumnsNumber) {
       self.selectedColumn = 0;
     }
-    
+
     self.opts.columnSelector.selectedIndex = self.selectedColumn;
   },
 
@@ -262,9 +263,76 @@ var statCalc = {
     Object.keys(self.opts.out).forEach(function (key) {
       self.opts.out[key].value = '';
     });
-    
+
     self.rebuildColumnSelector(0);
     self.lastColumnsNumber = 0;
+  }
+};
+
+var plotter = {
+  init: function (opts) {
+    var self = this;
+
+    /*
+     * opts = {
+     *   wrapper: (DOM object)
+     * }
+     */
+
+    self.chart = new Dygraph(
+            opts.wrapper,
+            [[0, 0], [1, 0]],
+            {
+              legend:'always',
+              strokeWidth:1.5,
+              labels:['X', 'Y'],
+              showRangeSelector: true,
+              rangeSelectorPlotFillColor: 'MediumSlateBlue',
+              rangeSelectorPlotFillGradientColor: 'rgba(123, 104, 238, 0)',
+              colorValue: 0.9,
+              fillAlpha: 0.4
+            }
+    );
+  },
+
+  plot: function (data, columns) {
+    var self = this;
+
+    self.chart.updateOptions({
+      labels: self.generateLabels(columns),
+      file: self.reparseDataToSeries(data, columns)
+    });
+  },
+
+  reparseDataToSeries: function (data, columns) {
+    var series = [];
+
+    if (columns < 2) {
+      for (var i = 0; i < data.length; i++) {
+        series.push([i, data[i]]);
+      }
+    } else {
+      for (var k = 0; k < data[0].length; k++) {
+        series.push([]);
+        for (var j = 0; j < columns; j++) {
+          series[k].push(data[j][k]);
+        }
+      }
+    }
+
+    return series;
+  },
+
+  generateLabels: function (columns) {
+    if (columns < 2) {
+      return ['X', 'Column 0'];
+    } else {
+      var labels = [];
+      for (var i = 0; i < columns; i++) {
+        labels.push('Column ' + i);
+      }
+      return labels;
+    }
   }
 };
 
@@ -428,10 +496,15 @@ statCalc.init({
   }
 });
 
+plotter.init({
+  wrapper: document.getElementById('plotWrapper')
+});
+
 dataHandler.init({
   input: document.getElementById('inpuData'),
-  onChange: function(data, columns) {
+  onChange: function (data, columns) {
     statCalc.calculate(data, columns);
+    plotter.plot(data, columns);
   }
 });
 
