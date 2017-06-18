@@ -141,7 +141,7 @@ var dataHandler = {
   getNumberOfColumns: function (data) {
     var self = this;
 
-    var firstLine = data.match(/.+\n/)[0];
+    var firstLine = data.match(/.+[\n\r]|.+$/)[0];
     var numbers = self.extractNumbers(firstLine);
     return (numbers !== null) ? numbers.length : null;
   },
@@ -262,6 +262,9 @@ var statCalc = {
     Object.keys(self.opts.out).forEach(function (key) {
       self.opts.out[key].value = '';
     });
+    
+    self.rebuildColumnSelector(0);
+    self.lastColumnsNumber = 0;
   }
 };
 
@@ -330,7 +333,7 @@ var dictate = {
       }
     }
 
-    self.opts.input.value += transcript + ' ';
+    self.opts.input.value += transcript + '\n';
 
     event = new Event('input');
     self.opts.input.dispatchEvent(event);
