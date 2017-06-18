@@ -85,22 +85,13 @@ var statLib = {
   }
 };
 
-var statCalc = {
+var dataHandler = {
   init: function (opts) {
     var self = this;
     /*
      * opts = {
      *   input: (DOM object - text input or textarea)
-     *   out:{
-     *     min: (DOM object - text input)
-     *     max: (DOM object - text input)
-     *     sum: (DOM object - text input)
-     *     mean: (DOM object - text input)
-     *     median: (DOM object - text input)
-     *     variance: (DOM object - text input)
-     *     stdDeviation: (DOM object - text input)
-     *     uncertainty: (DOM object - text input)
-     *   }
+     *   onChange: function (values - 1D or 2D array, columns) {}
      * }
      */
     self.opts = opts;
@@ -114,14 +105,109 @@ var statCalc = {
 
   processData: function (data) {
     var self = this;
+    
+    if(data.length < 1) {
+      self.opts.onChange(null, 0);
+      return;
+    }
 
-    // Get array of values from string
+    var columns = self.getNumberOfColumns(data);
+    if (columns === null) {
+      console.error('Unsupported data detected');
+      return;
+    }
+    
     var values = self.extractNumbers(data);
 
-    if (values === null) {
+    if (columns > 1) {
+      values = self.to2DArray(values, columns);
+    }
+
+    // Calculate stats
+    if (typeof self.opts.onChange === 'function') {
+      self.opts.onChange(values, columns);
+    }
+  },
+
+  extractNumbers: (function () {
+    var numberPattern = /\-?\d+\.?\d*e\-?\+?\d+|\-?\d*\.?\d+/g;
+
+    return function (data) {
+      var numbers = data.match(numberPattern);
+      return (numbers !== null) ? numbers.map(Number) : null;
+    };
+  })(),
+
+  getNumberOfColumns: function (data) {
+    var self = this;
+
+    var firstLine = data.match(/.+\n/)[0];
+    var numbers = self.extractNumbers(firstLine);
+    return (numbers !== null) ? numbers.length : null;
+  },
+
+  to2DArray: function (values, columns) {
+    var array2D = [];
+
+    for (var i = 0; i < columns; i++) {
+      array2D.push([]);
+    }
+
+    for (var j = 0; j < values.length; j++) {
+      array2D[j % columns].push(values[j]);
+    }
+
+    return array2D;
+  }
+};
+
+var statCalc = {
+  init: function (opts) {
+    var self = this;
+    /*
+     * opts = {
+     *   columnSelectorWrapper: (DOM object)
+     *   out:{
+     *     min: (DOM object - text input)
+     *     max: (DOM object - text input)
+     *     sum: (DOM object - text input)
+     *     mean: (DOM object - text input)
+     *     median: (DOM object - text input)
+     *     variance: (DOM object - text input)
+     *     stdDeviation: (DOM object - text input)
+     *     uncertainty: (DOM object - text input)
+     *   }
+     * }
+     */
+    self.opts = opts;
+    
+    self.columnSelector = null;
+    self.selectedColumn = 0;
+    self.lastColumnsNumber = 0;
+    self.lastData = null;
+    
+    self.rebuildColumnSelector(0);
+    self.opts.columnSelector.addEventListener('change', self.onColumnChange.bind(self));
+
+    return self;
+  },
+
+  calculate: function (data, columns) {
+    var self = this;
+    
+    self.lastData = data;
+    
+    if (!data) {
       self.clear();
       return;
     }
+
+    if (self.lastColumnsNumber !== columns) {
+      self.lastColumnsNumber = columns;
+      self.rebuildColumnSelector(columns);
+    }
+    
+    var values = (columns > 1) ? data[self.selectedColumn] : data;
 
     // Calculate stats
     self.opts.out.min.value = statLib.min(values);
@@ -133,15 +219,42 @@ var statCalc = {
     self.opts.out.stdDeviation.value = statLib.stdDeviation(values, self.opts.out.variance.value);
     self.opts.out.uncertainty.value = statLib.uncertainty(values, self.opts.out.variance.value);
   },
+  
+  onColumnChange: function (e) {
+    var self = this;
+    
+    var select = e.target;
+    self.selectedColumn = select.options[select.selectedIndex].value;
+    
+    self.calculate(self.lastData, self.lastColumnsNumber);
+  },
 
-  extractNumbers: (function () {
-    var numberPattern = /\-?\d+\.?\d*e\-?\+?\d+|\-?\d*\.?\d+/g;
-
-    return function (data) {
-      var numbers = data.match(numberPattern);
-      return (numbers !== null) ? numbers.map(Number) : null;
-    };
-  })(),
+  rebuildColumnSelector: function (columns) {
+    var self = this;
+    
+    if (columns === 0) {
+      self.opts.columnSelector.innerHTML = '<option>No columns detected</option>';
+      return;
+    }
+    
+    self.opts.columnSelector.innerHTML = '';
+    var frag = document.createDocumentFragment();
+    
+    for (var i = 0; i < columns; i++) {
+      var opt = document.createElement('option');
+      opt.innerHTML = 'Column ' + i;
+      opt.value = i;
+      frag.appendChild(opt);
+    }
+    
+    self.opts.columnSelector.appendChild(frag);
+    
+    if (self.selectedColumn + 1 > self.lastColumnsNumber) {
+      self.selectedColumn = 0;
+    }
+    
+    self.opts.columnSelector.selectedIndex = self.selectedColumn;
+  },
 
   clear: function () {
     var self = this;
@@ -294,8 +407,12 @@ var fileChooser = {
   }
 };
 
+/**
+ * Initializations ---------------------------------------------------------- >
+ */
+
 statCalc.init({
-  input: document.getElementById('inpuData'),
+  columnSelector: document.getElementById('calcColumnSelector'),
   out: {
     min: document.getElementById('minValue'),
     max: document.getElementById('maxValue'),
@@ -305,6 +422,13 @@ statCalc.init({
     variance: document.getElementById('varianceValue'),
     stdDeviation: document.getElementById('stdDeviationValue'),
     uncertainty: document.getElementById('uncertaintyValue')
+  }
+});
+
+dataHandler.init({
+  input: document.getElementById('inpuData'),
+  onChange: function(data, columns) {
+    statCalc.calculate(data, columns);
   }
 });
 
@@ -321,9 +445,9 @@ fileChooser.init({
     var reader = new FileReader();
 
     reader.onload = function (e) {
-      statCalc.opts.input.value = e.target.result;
+      dataHandler.opts.input.value = e.target.result;
       event = new Event('input');
-      statCalc.opts.input.dispatchEvent(event);
+      dataHandler.opts.input.dispatchEvent(event);
     };
     reader.onerror = function (e) {
       console.error(e);

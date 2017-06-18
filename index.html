@@ -16,7 +16,7 @@
       
       <div class="controls-wrapper">
         <div class="data-input-item">
-          <label for="inpuData">Values, separated by spaces or new lines</label>
+          <label for="inpuData">Data <span class="info-tooltip" data-title="Values separated by new lines. Columns separated by comma, space or tab.">&#128712;</span></label>
           <textarea id="inpuData" rows="10" cols="50"></textarea>
         </div>
         
@@ -29,6 +29,11 @@
           <input class="file-input" type="file" id="fileInput" />
           <label id="fileLoadBox" for="fileInput">Click or drag a file here</label>
         </div> 
+        
+        <div class="column-selector-item">
+          <label>Choose column</label>
+          <select class="column-selector" id="calcColumnSelector"></select> 
+        </div>
       </div>
       
       <div class="results-wrapper">
