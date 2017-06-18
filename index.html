@@ -14,13 +14,12 @@
   </head>
   <body>
     <div class="rssc-wrapper">
+      <div class="data-input-item">
+        <label for="inpuData">Data <span class="info-tooltip" data-title="Values separated by new lines. Columns separated by comma, space or tab."></span></label>
+        <textarea id="inpuData" rows="10" cols="50"></textarea>
+      </div>
       
       <div class="controls-wrapper">
-        <div class="data-input-item">
-          <label for="inpuData">Data <span class="info-tooltip" data-title="Values separated by new lines. Columns separated by comma, space or tab."></span></label>
-          <textarea id="inpuData" rows="10" cols="50"></textarea>
-        </div>
-        
         <div class="dictate-toggler-item">
           <input id="dictateToggler" type="checkbox">
           <label for="dictateToggler"> Dictate</label>
@@ -33,7 +32,9 @@
         
         <div class="column-selector-item">
           <label>Choose a column</label>
-          <select class="column-selector" id="calcColumnSelector"></select> 
+          <div class="select-style">
+            <select class="column-selector" id="calcColumnSelector"></select> 
+          </div>
         </div>
       </div>
       

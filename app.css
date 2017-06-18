@@ -55,6 +55,14 @@ body{
   resize: vertical;
   border: 4px solid #000;
 }
+.controls-wrapper{
+  display:flex;
+  flex-flow: row wrap; 
+  justify-content: space-between;
+}
+.controls-wrapper > div{
+  margin:0 5px;
+}
 .file-loader-item,
 .dictate-toggler-item,
 .column-selector-item{
@@ -62,7 +70,6 @@ body{
 }
 .column-selector-item {
   vertical-align:top;
-  margin:0 10px;
 }
 .dictate-toggler-item > label,
 .file-loader-item > label{
@@ -141,6 +148,37 @@ body{
 .rssc-wrapper .results-item{
   padding: 5px;
 }
+
+.select-style {
+  position: relative;
+  display: inline-block;
+}
+.select-style:before {
+  content: "";
+  display: inline-block;
+  position: absolute;
+  top: 50%;
+  margin-top: -1.5px;
+  right: 7px;
+  width: 0;
+  height: 0;
+  border: 5px solid transparent;
+  border-top-color: #000;
+}
+.select-style select {
+  color: #000;
+  display: inline-block;
+  position: relative;
+  box-shadow: none;
+  -webkit-appearance: none;
+     -moz-appearance: none;
+          appearance: none;
+  padding: 2px 22px 2px 7px;
+  border: 2px solid;
+  border-radius: 2px;
+  background: transparent;
+}
+
 
 /* Plot */
 .plot-section{

@@ -283,14 +283,18 @@ var plotter = {
             opts.wrapper,
             [[0, 0], [1, 0]],
             {
-              legend:'always',
-              strokeWidth:1.5,
-              labels:['X', 'Y'],
+              legend: 'always',
+              strokeWidth: 1.5,
+              labels: ['X', 'Y'],
               showRangeSelector: true,
-              rangeSelectorPlotFillColor: 'MediumSlateBlue',
-              rangeSelectorPlotFillGradientColor: 'rgba(123, 104, 238, 0)',
+              rangeSelectorPlotFillColor: '#fff',
+              rangeSelectorPlotFillGradientColor: '#333',
+              rangeSelectorPlotStrokeColor: '#eee',
+              rangeSelectorForegroundStrokeColor: 'rgba(255,255,255,0.6)',
+              rangeSelectorForegroundLineWidth: 0.5,
               colorValue: 0.9,
-              fillAlpha: 0.4
+              fillAlpha: 0.4,
+              colors: ['#aaee55', '#EF767A', '#23F0C7', '#6665DD', '#FFE366', '#1C5Dff', '#705246', '#F9DEC9']
             }
     );
   },
@@ -305,6 +309,10 @@ var plotter = {
   },
 
   reparseDataToSeries: function (data, columns) {
+    if (data === null) {
+      return [[0, 0], [1, 0]];
+    }
+
     var series = [];
 
     if (columns < 2) {
