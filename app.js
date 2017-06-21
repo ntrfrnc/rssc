@@ -97,6 +97,14 @@ var dataHandler = {
      */
     self.opts = opts;
 
+    self.separator = null;
+    self.separatorPattern = '[\\t, \\|;]';
+    self.numberPattern = '\\-?\d+\\.?\\d*e\\-?\\+?\\d+|\\-?\\d*\\.?\\d+';
+    self.numberCellPattern = self.numberPattern + '((' + self.separatorPattern + ')|$)';
+    self.numberRegExp = new RegExp(self.numberPattern);
+    self.numberCellRegExp = new RegExp(self.numberCellPattern);
+    self.numericLineRegExp = new RegExp('^(' + self.numberCellPattern + ')+');
+
     self.opts.input.addEventListener('input', function (e) {
       self.processData.call(self, e.target.value);
     }, false);
@@ -108,57 +116,151 @@ var dataHandler = {
     var self = this;
 
     if (data.length < 1) {
-      self.opts.onChange(null, 0);
+      self.opts.onChange(null, []);
       return;
     }
 
-    var columns = self.getNumberOfColumns(data);
-    if (columns === null) {
-      console.error('Unsupported data detected');
+    var dataLines = data.split('\n');
+    var valuesLineIndex = self.getFirstNumericDataLineIndex(dataLines);
+
+    if (valuesLineIndex === -1) {
+      self.opts.onChange(null, []);
+      console.warn('Unsupported data detected');
       return;
     }
 
-    var values = self.extractNumbers(data);
+    self.separator = self.extractSeparator(dataLines[valuesLineIndex]);
 
-    if (columns > 1) {
-      values = self.to2DArray(values, columns);
+    var columnsLabels;
+    var values;
+
+    if (self.separator === void(0)) { // one column data
+      columnsLabels = self.getColumnLabel(dataLines, valuesLineIndex);
+      values = self.get1DValues(dataLines, valuesLineIndex);
+    } else { // multi-column data
+      columnsLabels = self.getColumnsLabels(dataLines, valuesLineIndex);
+      values = self.reparseValuesArray(self.get2DValues(dataLines, valuesLineIndex), columnsLabels.length);
     }
 
-    // Calculate stats
+    // Invoke callback
     if (typeof self.opts.onChange === 'function') {
-      self.opts.onChange(values, columns);
+      self.opts.onChange(values, columnsLabels);
     }
   },
 
-  extractNumbers: (function () {
-    var numberPattern = /\-?\d+\.?\d*e\-?\+?\d+|\-?\d*\.?\d+/g;
-
-    return function (data) {
-      var numbers = data.match(numberPattern);
-      return (numbers !== null) ? numbers.map(Number) : null;
-    };
-  })(),
-
-  getNumberOfColumns: function (data) {
+  extractCells: function (dataLine) {
     var self = this;
 
-    var firstLine = data.match(/.+[\n\r]|.+$/)[0];
-    var numbers = self.extractNumbers(firstLine);
-    return (numbers !== null) ? numbers.length : null;
+    return dataLine.split(self.separator);
   },
 
-  to2DArray: function (values, columns) {
-    var array2D = [];
+  extractSeparator: function (dataLine) {
+    var self = this;
+
+    return dataLine.match(self.numberCellRegExp)[2];
+  },
+
+  get1DValues: function (dataLines, startLine) {
+    var valuesArray = [];
+
+    for (var i = startLine; i < dataLines.length; i++) {
+      if (dataLines[i] === '') {
+        continue;
+      }
+
+      valuesArray.push(Number(dataLines[i]));
+    }
+
+    return valuesArray;
+  },
+
+  get2DValues: function (dataLines, startLine) {
+    var self = this;
+
+    var valuesArray = [];
+    var lineValues;
+
+    for (var i = startLine; i < dataLines.length; i++) {
+      lineValues = self.extractCells(dataLines[i]);
+
+      if (lineValues.length < 2 && lineValues[0] === '') {
+        continue;
+      }
+
+      valuesArray.push(lineValues);
+    }
+
+    return valuesArray;
+  },
+
+  reparseValuesArray: function (values, columns) {
+    var valArray = [];
 
     for (var i = 0; i < columns; i++) {
-      array2D.push([]);
+      valArray.push([]);
     }
 
     for (var j = 0; j < values.length; j++) {
-      array2D[j % columns].push(values[j]);
+      for (var k = 0; k < columns; k++) {
+        valArray[k].push(Number(values[j][k]));
+      }
     }
 
-    return array2D;
+    return valArray;
+  },
+
+  getFirstNumericDataLineIndex: function (dataLines) {
+    var self = this;
+
+    var numericDataFound = false;
+
+    for (var i = 0; i < dataLines.length; i++) {
+      if (self.numericLineRegExp.test(dataLines[i])) {
+        numericDataFound = true;
+        break;
+      }
+    }
+
+    return numericDataFound ? i : -1;
+  },
+
+  getColumnsLabels: function (dataLines, valuesLineIndex) {
+    var self = this;
+
+    var columns = self.extractCells(dataLines[valuesLineIndex]).length;
+
+    if (valuesLineIndex > 0) {
+      var columnLabels = self.extractCells(dataLines[valuesLineIndex - 1]);
+
+      if (columnLabels.length === columns) {
+        // there is at least one line of header and it contains columns labels
+        return columnLabels;
+      }
+    }
+
+    // If there is no column labels in header
+    return self.generateColumnsLabels(columns);
+  },
+
+  getColumnLabel: function (dataLines, valuesLineIndex) {
+    var self = this;
+
+    if (valuesLineIndex > 0) {
+      return [dataLines[valuesLineIndex - 1]];
+    }
+
+    // If there is no column label in header
+    return self.generateColumnsLabels(1);
+  },
+
+  generateColumnsLabels: function (columns) {
+    var labels = [];
+
+    for (var i = 0; i < columns; i++) {
+      labels.push('Column ' + i);
+    }
+
+    return labels;
   }
 };
 
@@ -184,7 +286,7 @@ var statCalc = {
 
     self.columnSelector = null;
     self.selectedColumn = 0;
-    self.lastColumnsNumber = 0;
+    self.lastColumnsLabels = [];
     self.lastData = null;
 
     self.rebuildColumnSelector(0);
@@ -193,7 +295,7 @@ var statCalc = {
     return self;
   },
 
-  calculate: function (data, columns) {
+  calculate: function (data, columnsLabels) {
     var self = this;
 
     self.lastData = data;
@@ -203,12 +305,10 @@ var statCalc = {
       return;
     }
 
-    if (self.lastColumnsNumber !== columns) {
-      self.lastColumnsNumber = columns;
-      self.rebuildColumnSelector(columns);
-    }
+    self.lastColumnsLabels = columnsLabels;
+    self.rebuildColumnSelector(columnsLabels);
 
-    var values = (columns > 1) ? data[self.selectedColumn] : data;
+    var values = (columnsLabels.length > 1) ? data[self.selectedColumn] : data;
 
     // Calculate stats
     self.opts.out.min.value = statLib.min(values);
@@ -227,13 +327,13 @@ var statCalc = {
     var select = e.target;
     self.selectedColumn = select.options[select.selectedIndex].value;
 
-    self.calculate(self.lastData, self.lastColumnsNumber);
+    self.calculate(self.lastData, self.lastColumnsLabels);
   },
 
-  rebuildColumnSelector: function (columns) {
+  rebuildColumnSelector: function (columnsLabels) {
     var self = this;
 
-    if (columns === 0) {
+    if (!columnsLabels || columnsLabels.length === 0) {
       self.opts.columnSelector.innerHTML = '<option>No columns detected</option>';
       return;
     }
@@ -241,9 +341,9 @@ var statCalc = {
     self.opts.columnSelector.innerHTML = '';
     var frag = document.createDocumentFragment();
 
-    for (var i = 0; i < columns; i++) {
+    for (var i = 0; i < columnsLabels.length; i++) {
       var opt = document.createElement('option');
-      opt.innerHTML = 'Column ' + i;
+      opt.innerHTML = columnsLabels[i];
       opt.value = i;
       frag.appendChild(opt);
     }
@@ -264,7 +364,7 @@ var statCalc = {
       self.opts.out[key].value = '';
     });
 
-    self.rebuildColumnSelector(0);
+    self.rebuildColumnSelector();
     self.lastColumnsNumber = 0;
   }
 };
@@ -299,48 +399,50 @@ var plotter = {
     );
   },
 
-  plot: function (data, columns) {
+  plot: function (data, columnsLabels) {
     var self = this;
 
+    var labels;
+    switch (columnsLabels.length) {
+      case 0:
+        labels = ['X', 'Y'];
+        break;
+
+      case 1:
+        labels = ['X', columnsLabels[0]];
+        break;
+
+      default:
+        labels = columnsLabels;
+    }
+
     self.chart.updateOptions({
-      labels: self.generateLabels(columns),
-      file: self.reparseDataToSeries(data, columns)
+      labels: labels,
+      file: self.reparseDataToSeries(data, columnsLabels)
     });
   },
 
-  reparseDataToSeries: function (data, columns) {
+  reparseDataToSeries: function (data, columnsLabels) {
     if (data === null) {
       return [[0, 0], [1, 0]];
     }
 
     var series = [];
 
-    if (columns < 2) {
+    if (columnsLabels.length < 2) {
       for (var i = 0; i < data.length; i++) {
         series.push([i, data[i]]);
       }
     } else {
       for (var k = 0; k < data[0].length; k++) {
         series.push([]);
-        for (var j = 0; j < columns; j++) {
+        for (var j = 0; j < columnsLabels.length; j++) {
           series[k].push(data[j][k]);
         }
       }
     }
 
     return series;
-  },
-
-  generateLabels: function (columns) {
-    if (columns < 2) {
-      return ['X', 'Column 0'];
-    } else {
-      var labels = [];
-      for (var i = 0; i < columns; i++) {
-        labels.push('Column ' + i);
-      }
-      return labels;
-    }
   }
 };
 

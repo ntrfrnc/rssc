@@ -182,7 +182,7 @@ body{
 
 /* Plot */
 .plot-section{
-  margin: 3em auto;
+  margin: 2em auto 1em auto;
   padding: 15px;
   padding-top:30px;
   background-color:#101015;
