@@ -247,7 +247,7 @@ var dataHandler = {
 
     if (valuesLineIndex > 0) {
       var label = dataLines[valuesLineIndex - 1];
-      
+
       if (label !== '') {
         return [label];
       }
@@ -457,13 +457,31 @@ var dictate = {
     self.opts = {
       // toggler: (DOM object - checkbox),
       // input: (DOM object - text input or textarea),
+      // onNoSupport: function(){},
       continous: true,
       lang: 'pl-PL'
     };
 
     tools.extend(self.opts, opts);
+    
+    try {
+      var SpeechRecognition = SpeechRecognition || webkitSpeechRecognition;
+      
+      if (SpeechRecognition === void(0)) { // No speech recognition support
+        if (typeof self.opts.onNoSupport === 'function') {
+          self.opts.onNoSupport();
+        }
 
-    var SpeechRecognition = SpeechRecognition || webkitSpeechRecognition;
+        return;
+      }
+    } catch (err) {
+      if (typeof self.opts.onNoSupport === 'function') {
+        self.opts.onNoSupport();
+      }
+      
+      return;
+    }
+
     self.recognition = new SpeechRecognition();
     self.recognition.continuous = self.opts.continuous;
     self.recognition.lang = self.opts.lang;
@@ -624,7 +642,10 @@ dataHandler.init({
 
 dictate.init({
   toggler: document.getElementById('dictateToggler'),
-  input: statCalc.opts.input
+  input: statCalc.opts.input,
+  onNoSupport: function () {
+    document.getElementById('dictateToggler').parentNode.style.display = 'none';
+  }
 });
 
 fileChooser.init({
