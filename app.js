@@ -246,7 +246,11 @@ var dataHandler = {
     var self = this;
 
     if (valuesLineIndex > 0) {
-      return [dataLines[valuesLineIndex - 1]];
+      var label = dataLines[valuesLineIndex - 1];
+      
+      if (label !== '') {
+        return [label];
+      }
     }
 
     // If there is no column label in header
