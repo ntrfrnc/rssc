@@ -329,7 +329,7 @@ var statCalc = {
     var self = this;
 
     var select = e.target;
-    self.selectedColumn = select.options[select.selectedIndex].value;
+    self.selectedColumn = Number(select.options[select.selectedIndex].value);
 
     self.calculate(self.lastData, self.lastColumnsLabels);
   },
@@ -380,8 +380,14 @@ var plotter = {
     /*
      * opts = {
      *   wrapper: (DOM object)
+     *   axisSelector:{
+     *     x: (DOM object - select)
+     *     y: (DOM object - select)
+     *   }
      * }
      */
+
+    self.opts = opts;
 
     self.chart = new Dygraph(
             opts.wrapper,
@@ -401,32 +407,60 @@ var plotter = {
               colors: ['#aaee55', '#EF767A', '#23F0C7', '#6665DD', '#FFE366', '#1C5Dff', '#705246', '#F9DEC9']
             }
     );
+    self.selectedAxis = {
+      x: 0,
+      y: [1]
+    };
+    self.lastColumnsLabels = [];
+    self.lastData = null;
+
+    self.opts.axisSelector.y.multiple = true;
+    self.opts.axisSelector.y.size = 3;
+    self.rebuildAxisSelector(0, 'x');
+    self.rebuildAxisSelector(0, 'y');
+    self.opts.axisSelector.x.addEventListener('change', self.onXAxisChange.bind(self));
+    self.opts.axisSelector.y.addEventListener('change', self.onYAxisChange.bind(self));
   },
 
   plot: function (data, columnsLabels) {
     var self = this;
 
+    self.lastData = data;
+    self.lastColumnsLabels = columnsLabels;
+
     var labels;
     switch (columnsLabels.length) {
       case 0:
         labels = ['X', 'Y'];
+        self.rebuildAxisSelector(0, 'x');
+        self.rebuildAxisSelector(0, 'y');
         break;
 
       case 1:
         labels = ['X', columnsLabels[0]];
+        self.rebuildAxisSelector(['Auto increment'], 'x');
+        self.rebuildAxisSelector(columnsLabels, 'y');
         break;
 
       default:
-        labels = columnsLabels;
+        labels = [columnsLabels[self.selectedAxis.x]];
+        labels = labels.concat(self.selectedAxis.y.map(function (i) {
+          return columnsLabels[i];
+        }));
+        self.rebuildAxisSelector(columnsLabels, 'x');
+        self.rebuildAxisSelector(columnsLabels, 'y');
     }
 
     self.chart.updateOptions({
       labels: labels,
+      xlabel: labels[0],
       file: self.reparseDataToSeries(data, columnsLabels)
     });
   },
 
   reparseDataToSeries: function (data, columnsLabels) {
+    var self = this;
+
     if (data === null) {
       return [[0, 0], [1, 0]];
     }
@@ -439,14 +473,76 @@ var plotter = {
       }
     } else {
       for (var k = 0; k < data[0].length; k++) {
-        series.push([]);
-        for (var j = 0; j < columnsLabels.length; j++) {
-          series[k].push(data[j][k]);
+        series.push([data[self.selectedAxis.x][k]]);
+        for (var j = 0; j < self.selectedAxis.y.length; j++) {
+          series[k].push(data[self.selectedAxis.y[j]][k]);
         }
       }
     }
 
     return series;
+  },
+
+  onXAxisChange: function (e) {
+    var self = this;
+
+    var select = e.target;
+    self.selectedAxis.x = Number(select.options[select.selectedIndex].value);
+
+    self.plot(self.lastData, self.lastColumnsLabels);
+  },
+
+  onYAxisChange: function (e) {
+    var self = this;
+
+    var select = e.target;
+    self.selectedAxis.y = [].filter.call(select.options, function (o) {
+      return o.selected;
+    }).map(function (o) {
+      return Number(o.value);
+    });
+
+    self.plot(self.lastData, self.lastColumnsLabels);
+  },
+
+  rebuildAxisSelector: function (columnsLabels, axis) {
+    var self = this;
+
+    if (!columnsLabels || columnsLabels.length === 0) {
+      self.opts.axisSelector[axis].innerHTML = '<option>No data available</option>';
+      return;
+    }
+
+    self.opts.axisSelector[axis].innerHTML = '';
+    var frag = document.createDocumentFragment();
+
+    for (var i = 0; i < columnsLabels.length; i++) {
+      var opt = document.createElement('option');
+      opt.innerHTML = columnsLabels[i];
+      opt.value = i;
+      frag.appendChild(opt);
+    }
+
+    self.opts.axisSelector[axis].appendChild(frag);
+
+    switch (axis) {
+      case 'x':
+        if (self.selectedAxis[axis] + 1 > self.lastColumnsLabels.length) {
+          self.selectedAxis[axis] = 0;
+        }
+        self.opts.axisSelector[axis].selectedIndex = self.selectedAxis[axis];
+        break;
+
+      case 'y':
+        if (self.selectedAxis[axis][self.selectedAxis[axis].length - 1] > self.lastColumnsLabels.length) {
+          self.selectedAxis[axis] = [1];
+        }
+        for (var j = 0; j < self.selectedAxis[axis].length; j++) {
+          self.opts.axisSelector[axis].options[self.selectedAxis[axis][j]].selected = true;
+        }
+        break;
+    }
+
   }
 };
 
@@ -463,10 +559,10 @@ var dictate = {
     };
 
     tools.extend(self.opts, opts);
-    
+
     try {
       var SpeechRecognition = SpeechRecognition || webkitSpeechRecognition;
-      
+
       if (SpeechRecognition === void(0)) { // No speech recognition support
         if (typeof self.opts.onNoSupport === 'function') {
           self.opts.onNoSupport();
@@ -478,7 +574,7 @@ var dictate = {
       if (typeof self.opts.onNoSupport === 'function') {
         self.opts.onNoSupport();
       }
-      
+
       return;
     }
 
@@ -629,7 +725,11 @@ statCalc.init({
 });
 
 plotter.init({
-  wrapper: document.getElementById('plotWrapper')
+  wrapper: document.getElementById('plotWrapper'),
+  axisSelector: {
+    x: document.getElementById('XAxisSelector'),
+    y: document.getElementById('YAxisSelector')
+  }
 });
 
 dataHandler.init({

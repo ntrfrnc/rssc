@@ -171,8 +171,8 @@ body{
   position: relative;
   box-shadow: none;
   -webkit-appearance: none;
-     -moz-appearance: none;
-          appearance: none;
+  -moz-appearance: none;
+  appearance: none;
   padding: 2px 22px 2px 7px;
   border: 2px solid;
   border-radius: 2px;
@@ -181,18 +181,24 @@ body{
 
 
 /* Plot */
-.plot-section{
+.plotting-section{
   margin: 2em auto 1em auto;
+}
+.plot-controls > div{
+  display: inline-block;
+  margin: 5px 0px 5px 5px;
+}
+.chart-container{
   padding: 15px;
   padding-top:30px;
   background-color:#101015;
   border-radius: 4px;
 }
-.plot-wrapper{
+.chart-wrapper{
   position:relative;
   color: #fff;
 }
-.plot-wrapper * {
+.chart-wrapper * {
   color: #fff;
 }
 .dygraph-legend {
@@ -202,6 +208,9 @@ body{
   /*top:10px !important;*/
   top: -18px !important;
 }
-/*.plot-wrapper > div:first-child > div:nth-child(7){
+.dygraph-xlabel{
+  padding: 7px;
+}
+/*.chart-wrapper > div:first-child > div:nth-child(7){
   top:-18px !important;
 }*/
