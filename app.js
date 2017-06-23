@@ -530,13 +530,17 @@ var plotter = {
         if (self.selectedAxis[axis] + 1 > self.lastColumnsLabels.length) {
           self.selectedAxis[axis] = 0;
         }
+        
         self.opts.axisSelector[axis].selectedIndex = self.selectedAxis[axis];
         break;
 
       case 'y':
-        if (self.selectedAxis[axis][self.selectedAxis[axis].length - 1] > self.lastColumnsLabels.length) {
+        if(self.lastColumnsLabels.length < 2){
+          self.selectedAxis[axis] = [0];
+        }else if (self.selectedAxis[axis][self.selectedAxis[axis].length - 1] > self.lastColumnsLabels.length) {
           self.selectedAxis[axis] = [1];
         }
+        
         for (var j = 0; j < self.selectedAxis[axis].length; j++) {
           self.opts.axisSelector[axis].options[self.selectedAxis[axis][j]].selected = true;
         }
