@@ -354,7 +354,7 @@ var statCalc = {
 
     self.opts.columnSelector.appendChild(frag);
 
-    if (self.selectedColumn + 1 > self.lastColumnsNumber) {
+    if (self.selectedColumn + 1 > self.lastColumnsLabels.length) {
       self.selectedColumn = 0;
     }
 
@@ -368,8 +368,10 @@ var statCalc = {
       self.opts.out[key].value = '';
     });
 
-    self.rebuildColumnSelector();
-    self.lastColumnsNumber = 0;
+    self.rebuildColumnSelector(0);
+    self.selectedColumn = 0;
+    self.lastColumnsLabels = [];
+    self.lastData = null;
   }
 };
 
