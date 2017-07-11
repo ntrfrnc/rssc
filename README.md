@@ -5,7 +5,9 @@ Realtime simple statistics calculator
 Project Overview
 ----------------
 Progressive web app for realtime (as you input values) data analysis.  
+
 **Features**  
+
 * Multicolumn data support (csv format) with separator and header autodetection
 * Calculation of basic statistic properties
 * Plotting data
