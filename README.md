@@ -4,8 +4,13 @@ Realtime simple statistics calculator
 
 Project Overview
 ----------------
-Web app for realtime (as you input values) calculation of basic statistic properties of inserted data
- with voice input support (speech recognition, only polish language for now).
+Progressive web app for realtime (as you input values) data analysis.  
+**Features**  
+* Multicolumn data support (csv format) with separator and header autodetection
+* Calculation of basic statistic properties
+* Plotting data
+* Drag&drop file support (csv format)
+* Experimental voice input support (only polish language for now)
 
 **Version:** 1.0-beta  
 **Support:** Latest Mozilla Firefox, Google Chrome and IE11+
