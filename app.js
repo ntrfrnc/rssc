@@ -386,6 +386,7 @@ var plotter = {
      *     x: (DOM object - select)
      *     y: (DOM object - select)
      *   }
+     *   stepInput: (DOM object - input)
      * }
      */
 
@@ -419,6 +420,7 @@ var plotter = {
     self.rebuildAxisSelector(0, 'y');
     self.opts.axisSelector.x.addEventListener('change', self.onXAxisChange.bind(self));
     self.opts.axisSelector.y.addEventListener('change', self.onYAxisChange.bind(self));
+    self.opts.stepInput.addEventListener('input', self.onStepChange.bind(self));
   },
 
   plot: function (data, columnsLabels) {
@@ -467,8 +469,9 @@ var plotter = {
     var series = [];
 
     if (columnsLabels.length < 2) {
+      var step = Number(self.opts.stepInput.value);
       for (var i = 0; i < data.length; i++) {
-        series.push([i, data[i]]);
+        series.push([i * step, data[i]]);
       }
     } else {
       for (var k = 0; k < data[0].length; k++) {
@@ -500,6 +503,16 @@ var plotter = {
     }).map(function (o) {
       return Number(o.value);
     });
+
+    self.plot(self.lastData, self.lastColumnsLabels);
+  },
+
+  onStepChange: function () {
+    var self = this;
+
+    if (self.lastColumnsLabels.length > 1) {
+      return;
+    }
 
     self.plot(self.lastData, self.lastColumnsLabels);
   },
@@ -732,7 +745,8 @@ plotter.init({
   axisSelector: {
     x: document.getElementById('XAxisSelector'),
     y: document.getElementById('YAxisSelector')
-  }
+  },
+  stepInput: document.getElementById('autoincrementStep')
 });
 
 dataHandler.init({

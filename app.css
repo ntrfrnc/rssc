@@ -188,6 +188,11 @@ body{
   display: inline-block;
   margin: 5px 0px 5px 5px;
 }
+.step-input-item input{
+  width: 50px;
+  border: 2px solid;
+  padding: 2px;
+}
 .chart-container{
   padding: 15px;
   padding-top:30px;
