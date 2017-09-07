@@ -1,105 +1,106 @@
 <!DOCTYPE html>
 <html>
-  <head>
+<head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#000000" />
+    <meta name="theme-color" content="#000000"/>
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <title>Realtime simple statistics calculator</title>
     <link rel='shortcut icon' type='image/png' href='images/icon-16.png'>
     <link rel="manifest" href="manifest.json">
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/dygraph/2.0.0/dygraph.min.css" />
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/dygraph/2.0.0/dygraph.min.css"/>
     <link rel="stylesheet" href="app.css">
-  </head>
-  <body>
-    <div class="rssc-wrapper">
-      <div class="data-input-item">
-        <label for="inpuData">Data <span class="info-tooltip" data-title="Values separated by new lines. Columns separated by comma, space or tab."></span></label>
+</head>
+<body>
+<div class="rssc-wrapper">
+    <div class="data-input-item">
+        <label for="inpuData">Data <span class="info-tooltip"
+                                         data-title="Values separated by new lines. Columns separated by comma, space or tab."></span></label>
         <textarea id="inpuData" rows="10" cols="50"></textarea>
-      </div>
-      
-      <div class="controls-wrapper">
-        <div class="dictate-toggler-item">
-          <input id="dictateToggler" type="checkbox">
-          <label for="dictateToggler"> Dictate</label>
-        </div>
-        
-        <div class="file-loader-item">
-          <input class="file-input" type="file" id="fileInput" />
-          <label id="fileLoadBox" for="fileInput">Click or drag a file here</label>
-        </div> 
-        
-        <div class="column-selector-item">
-          <label>Choose a column</label>
-          <div class="select-style">
-            <select class="column-selector" id="calcColumnSelector"></select> 
-          </div>
-        </div>
-      </div>
-      
-      <div class="results-wrapper">
-        <div class="results-item">
-          <label for="minValue">Minimum</label>
-          <input id="minValue" type="text" readonly="readonly">
-        </div>
-
-        <div class="results-item">
-          <label for="maxValue">Maximum</label>
-          <input id="maxValue" type="text" readonly="readonly">
-        </div>
-
-        <div class="results-item">
-          <label for="sumValue">Sum</label>
-          <input id="sumValue" type="text" readonly="readonly">
-        </div>
-
-        <div class="results-item">
-          <label for="meanValue">Average</label>
-          <input id="meanValue" type="text" readonly="readonly">
-        </div>
-
-        <div class="results-item">
-          <label for="medianValue">Median</label>
-          <input id="medianValue" type="text" readonly="readonly">
-        </div>
-
-        <div class="results-item">
-          <label for="varianceValue">Variance</label>
-          <input id="varianceValue" type="text" readonly="readonly">
-        </div>
-
-        <div class="results-item">
-          <label for="stdDeviationValue">Standard deviation</label>
-          <input id="stdDeviationValue" type="text" readonly="readonly">
-        </div>
-
-        <div class="results-item">
-          <label for="uncertaintyValue">Uncertainty type A</label>
-          <input id="uncertaintyValue" type="text" readonly="readonly">
-        </div>
-      </div>
-      
-      <div class="plotting-section">
-        <div class="plot-controls">
-          <div class="select-item">
-            <label>X-axis</label>
-            <div class="select-style"><select id="XAxisSelector"></select></div>
-          </div>
-          <div class="select-item">
-            <label>Y-axis</label>
-            <div class="select-style"><select id="YAxisSelector"></select></div>
-          </div>
-        </div>
-        
-        <div class="chart-container">
-          <div class="chart-wrapper" style="width:95%; height:350px;" id="plotWrapper"></div>
-        </div>
-      </div>
-      
     </div>
-    
-    <script src="//cdnjs.cloudflare.com/ajax/libs/dygraph/2.0.0/dygraph.min.js"></script>
-    <script src="app.js"></script>
-  </body>
+
+    <div class="controls-wrapper">
+        <div class="dictate-toggler-item">
+            <input id="dictateToggler" type="checkbox">
+            <label for="dictateToggler"> Dictate</label>
+        </div>
+
+        <div class="file-loader-item">
+            <input class="file-input" type="file" id="fileInput"/>
+            <label id="fileLoadBox" for="fileInput">Click or drag a file here</label>
+        </div>
+
+        <div class="column-selector-item">
+            <label>Choose a column</label>
+            <div class="select-style">
+                <select class="column-selector" id="calcColumnSelector"></select>
+            </div>
+        </div>
+    </div>
+
+    <div class="results-wrapper">
+        <div class="results-item">
+            <label for="minValue">Minimum</label>
+            <input id="minValue" type="text" readonly="readonly">
+        </div>
+
+        <div class="results-item">
+            <label for="maxValue">Maximum</label>
+            <input id="maxValue" type="text" readonly="readonly">
+        </div>
+
+        <div class="results-item">
+            <label for="sumValue">Sum</label>
+            <input id="sumValue" type="text" readonly="readonly">
+        </div>
+
+        <div class="results-item">
+            <label for="meanValue">Average</label>
+            <input id="meanValue" type="text" readonly="readonly">
+        </div>
+
+        <div class="results-item">
+            <label for="medianValue">Median</label>
+            <input id="medianValue" type="text" readonly="readonly">
+        </div>
+
+        <div class="results-item">
+            <label for="varianceValue">Variance</label>
+            <input id="varianceValue" type="text" readonly="readonly">
+        </div>
+
+        <div class="results-item">
+            <label for="stdDeviationValue">Standard deviation</label>
+            <input id="stdDeviationValue" type="text" readonly="readonly">
+        </div>
+
+        <div class="results-item">
+            <label for="uncertaintyValue">Uncertainty type A</label>
+            <input id="uncertaintyValue" type="text" readonly="readonly">
+        </div>
+    </div>
+
+    <div class="plotting-section">
+        <div class="plot-controls">
+            <div class="select-item">
+                <label>X-axis</label>
+                <div class="select-style"><select id="XAxisSelector"></select></div>
+            </div>
+            <div class="select-item">
+                <label>Y-axis</label>
+                <div class="select-style"><select id="YAxisSelector"></select></div>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <div class="chart-wrapper" style="width:95%; height:350px;" id="plotWrapper"></div>
+        </div>
+    </div>
+
+</div>
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/dygraph/2.0.0/dygraph.min.js"></script>
+<script src="app.js"></script>
+</body>
 </html> 
