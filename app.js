@@ -61,7 +61,7 @@ var statLib = {
 
     var dev = 0;
 
-    for (var i = n; i--; ) {
+    for (var i = n; i--;) {
       dev += Math.pow(mean - values[i], 2);
     }
 
@@ -392,22 +392,22 @@ var plotter = {
     self.opts = opts;
 
     self.chart = new Dygraph(
-            opts.wrapper,
-            [[0, 0], [1, 0]],
-            {
-              legend: 'always',
-              strokeWidth: 1.5,
-              labels: ['X', 'Y'],
-              showRangeSelector: true,
-              rangeSelectorPlotFillColor: '#fff',
-              rangeSelectorPlotFillGradientColor: '#333',
-              rangeSelectorPlotStrokeColor: '#eee',
-              rangeSelectorForegroundStrokeColor: 'rgba(255,255,255,0.6)',
-              rangeSelectorForegroundLineWidth: 0.5,
-              colorValue: 0.9,
-              fillAlpha: 0.4,
-              colors: ['#aaee55', '#EF767A', '#23F0C7', '#6665DD', '#FFE366', '#1C5Dff', '#705246', '#F9DEC9']
-            }
+      opts.wrapper,
+      [[0, 0], [1, 0]],
+      {
+        legend: 'always',
+        strokeWidth: 1.5,
+        labels: ['X', 'Y'],
+        showRangeSelector: true,
+        rangeSelectorPlotFillColor: '#fff',
+        rangeSelectorPlotFillGradientColor: '#333',
+        rangeSelectorPlotStrokeColor: '#eee',
+        rangeSelectorForegroundStrokeColor: 'rgba(255,255,255,0.6)',
+        rangeSelectorForegroundLineWidth: 0.5,
+        colorValue: 0.9,
+        fillAlpha: 0.4,
+        colors: ['#aaee55', '#EF767A', '#23F0C7', '#6665DD', '#FFE366', '#1C5Dff', '#705246', '#F9DEC9']
+      }
     );
     self.selectedAxis = {
       x: 0,
@@ -532,17 +532,17 @@ var plotter = {
         if (self.selectedAxis[axis] + 1 > self.lastColumnsLabels.length) {
           self.selectedAxis[axis] = 0;
         }
-        
+
         self.opts.axisSelector[axis].selectedIndex = self.selectedAxis[axis];
         break;
 
       case 'y':
-        if(self.lastColumnsLabels.length < 2){
+        if (self.lastColumnsLabels.length < 2) {
           self.selectedAxis[axis] = [0];
-        }else if (self.selectedAxis[axis][self.selectedAxis[axis].length - 1] > self.lastColumnsLabels.length) {
+        } else if (self.selectedAxis[axis][self.selectedAxis[axis].length - 1] > self.lastColumnsLabels.length) {
           self.selectedAxis[axis] = [1];
         }
-        
+
         for (var j = 0; j < self.selectedAxis[axis].length; j++) {
           self.opts.axisSelector[axis].options[self.selectedAxis[axis][j]].selected = true;
         }
