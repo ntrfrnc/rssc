@@ -391,10 +391,7 @@ var plotter = {
 
     self.opts = opts;
 
-    self.chart = new Dygraph(
-      opts.wrapper,
-      [[0, 0], [1, 0]],
-      {
+    self.chart = new Dygraph(opts.wrapper, [[0, 0], [1, 0]], {
         legend: 'always',
         strokeWidth: 1.5,
         labels: ['X', 'Y'],
