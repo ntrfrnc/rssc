@@ -151,6 +151,7 @@ var dataHandler = {
   extractCells: function (dataLine) {
     var self = this;
 
+    dataLine = dataLine.replace(/\r$/g, ''); // Remove carriage return from windows file
     return dataLine.split(self.separator);
   },
 
@@ -386,13 +387,14 @@ var plotter = {
      *     x: (DOM object - select)
      *     y: (DOM object - select)
      *   }
+     *   data: (Array)
      *   stepInput: (DOM object - input)
      * }
      */
 
     self.opts = opts;
 
-    self.chart = new Dygraph(opts.wrapper, [[0, 0], [1, 0]], {
+    self.chart = new Dygraph(opts.wrapper, opts.data ? opts.data : [[0,0]], {
         legend: 'always',
         strokeWidth: 1.5,
         labels: ['X', 'Y'],
