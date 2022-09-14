@@ -17,7 +17,7 @@ Progressive web app for realtime (as you input values) data analysis.
 **Version:** 1.0-beta  
 **Support:** Latest Mozilla Firefox, Google Chrome and IE11+
 
-[TRY IT](http://rafaelpawlos.com/rssc)
+[TRY IT](https://pawlos.dev/rssc)
 
 
 License
@@ -29,4 +29,4 @@ RSSC is released under the terms of the MIT license. See LICENSE file for detail
 Credits
 ----------------
 
-RSSC is developed by Rafael Pawlos, http://rafaelpawlos.com
+RSSC is developed by Rafael Pawlos, https://pawlos.dev
